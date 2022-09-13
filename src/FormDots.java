@@ -60,8 +60,11 @@ public class FormDots extends JFrame implements Runnable {
                 double ny = (double) p.y / formHeight - 0.5;
                 nn.feedForward(new double[]{nx, ny});
                 double[] targets = new double[2];
-                if (p.type == 0) targets[0] = 1;
-                else targets[1] = 1;
+                if (p.color == Color.green) {
+                    targets[0] = 1;
+                } else {
+                    targets[1] = 1;
+                }
                 nn.backpropagation(targets);
             }
         }
@@ -83,8 +86,11 @@ public class FormDots extends JFrame implements Runnable {
         for (Point p : points) {
             ig.setColor(Color.WHITE);
             ig.fillOval(p.x - 3, p.y - 3, 26, 26);
-            if (p.type == 0) ig.setColor(Color.GREEN);
-            else ig.setColor(Color.BLUE);
+            if (p.color == Color.GREEN) {
+                ig.setColor(Color.GREEN);
+            } else {
+                ig.setColor(Color.BLUE);
+            }
             ig.fillOval(p.x, p.y, 20, 20);
         }
         g.drawImage(img, 8, 30, formWidth, formHeight, this);
@@ -92,8 +98,8 @@ public class FormDots extends JFrame implements Runnable {
 
 //    MouseListener
     void mousePressed(MouseEvent e) {
-        int type = 0;
-        if(e.getButton() == 3) type = 1;
-        points.add(new Point(e.getX() - 16, e.getY() - 38, type));
+        Color color = Color.green;
+        if(e.getButton() == 3) color = Color.blue;
+        points.add(new Point(e.getX() - 16, e.getY() - 38, color));
     }
 }

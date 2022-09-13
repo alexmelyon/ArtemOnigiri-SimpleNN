@@ -1,13 +1,15 @@
+import java.awt.*;
+
 public class Point {
 
     public int x;
     public int y;
-    public int type;
+    public Color color;
 
-    public Point(int x, int y, int type) {
+    public Point(int x, int y, Color type) {
         this.x = x;
         this.y = y;
-        this.type = type;
+        this.color = type;
     }
 
 }

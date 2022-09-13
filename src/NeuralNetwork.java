@@ -45,42 +45,43 @@ public class NeuralNetwork {
     }
 
     public void backpropagation(double[] targets) {
-        double[] errors = new double[layers[layers.length - 1].size];
-        for (int i = 0; i < layers[layers.length - 1].size; i++) {
+        int lastButOneLayerNeuronsCount = layers[layers.length - 1].size;
+        double[] errors = new double[lastButOneLayerNeuronsCount];
+        for (int i = 0; i < lastButOneLayerNeuronsCount; i++) {
             errors[i] = targets[i] - layers[layers.length - 1].neurons[i];
         }
-        for (int k = layers.length - 2; k >= 0; k--) {
-            Layer l = layers[k];
-            Layer l1 = layers[k + 1];
-            double[] errorsNext = new double[l.size];
-            double[] gradients = new double[l1.size];
-            for (int i = 0; i < l1.size; i++) {
-                gradients[i] = errors[i] * derivative.apply(layers[k + 1].neurons[i]);
+        for (int layerNum = layers.length - 2; layerNum >= 0; layerNum--) {
+            Layer layer = layers[layerNum];
+            Layer layerNext = layers[layerNum + 1];
+            double[] errorsNext = new double[layer.size];
+            double[] gradients = new double[layerNext.size];
+            for (int i = 0; i < layerNext.size; i++) {
+                gradients[i] = errors[i] * derivative.apply(layers[layerNum + 1].neurons[i]);
                 gradients[i] *= learningRate;
             }
-            double[][] deltas = new double[l1.size][l.size];
-            for (int i = 0; i < l1.size; i++) {
-                for (int j = 0; j < l.size; j++) {
-                    deltas[i][j] = gradients[i] * l.neurons[j];
+            double[][] deltas = new double[layerNext.size][layer.size];
+            for (int i = 0; i < layerNext.size; i++) {
+                for (int j = 0; j < layer.size; j++) {
+                    deltas[i][j] = gradients[i] * layer.neurons[j];
                 }
             }
-            for (int i = 0; i < l.size; i++) {
+            for (int i = 0; i < layer.size; i++) {
                 errorsNext[i] = 0;
-                for (int j = 0; j < l1.size; j++) {
-                    errorsNext[i] += l.weights[i][j] * errors[j];
+                for (int j = 0; j < layerNext.size; j++) {
+                    errorsNext[i] += layer.weights[i][j] * errors[j];
                 }
             }
-            errors = new double[l.size];
-            System.arraycopy(errorsNext, 0, errors, 0, l.size);
-            double[][] weightsNew = new double[l.weights.length][l.weights[0].length];
-            for (int i = 0; i < l1.size; i++) {
-                for (int j = 0; j < l.size; j++) {
-                    weightsNew[j][i] = l.weights[j][i] + deltas[i][j];
+            errors = new double[layer.size];
+            System.arraycopy(errorsNext, 0, errors, 0, layer.size);
+            double[][] weightsNew = new double[layer.weights.length][layer.weights[0].length];
+            for (int i = 0; i < layerNext.size; i++) {
+                for (int j = 0; j < layer.size; j++) {
+                    weightsNew[j][i] = layer.weights[j][i] + deltas[i][j];
                 }
             }
-            l.weights = weightsNew;
-            for (int i = 0; i < l1.size; i++) {
-                l1.biases[i] += gradients[i];
+            layer.weights = weightsNew;
+            for (int i = 0; i < layerNext.size; i++) {
+                layerNext.biases[i] += gradients[i];
             }
         }
     }
