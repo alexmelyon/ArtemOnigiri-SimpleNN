@@ -4,24 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.UnaryOperator;
 
-public class Main {
+public class MainDigits {
 
     public static void main(String[] args) throws IOException {
-        dots();
-//        digits();
-    }
-
-    private static void dots() {
-        FormDots f = new FormDots();
-        new Thread(f).start();
+        digits();
     }
 
     private static void digits() throws IOException {
-        UnaryOperator<Double> sigmoid = x -> 1 / (1 + Math.exp(-x));
-        UnaryOperator<Double> dsigmoid = y -> y * (1 - y);
-        NeuralNetwork nn = new NeuralNetwork(0.001, sigmoid, dsigmoid, 784, 512, 128, 32, 10);
+        UnaryOperator<Double> activationSigmoid = x -> 1 / (1 + Math.exp(-x));
+        UnaryOperator<Double> derivativeSigmoid = y -> y * (1 - y);
+        NeuralNetwork nn = new NeuralNetwork(0.001, activationSigmoid, derivativeSigmoid, 784, 512, 128, 32, 10);
 
-        int samples = 60000;
+        int samples = 60_000;
         BufferedImage[] images = new BufferedImage[samples];
         int[] digits = new int[samples];
         File[] imagesFiles = new File("./train").listFiles();

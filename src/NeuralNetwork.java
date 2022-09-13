@@ -12,14 +12,16 @@ public class NeuralNetwork {
         this.activation = activation;
         this.derivative = derivative;
         layers = new Layer[sizes.length];
-        for (int i = 0; i < sizes.length; i++) {
+        for (int layerNum = 0; layerNum < sizes.length; layerNum++) {
             int nextSize = 0;
-            if(i < sizes.length - 1) nextSize = sizes[i + 1];
-            layers[i] = new Layer(sizes[i], nextSize);
-            for (int j = 0; j < sizes[i]; j++) {
-                layers[i].biases[j] = Math.random() * 2.0 - 1.0;
-                for (int k = 0; k < nextSize; k++) {
-                    layers[i].weights[j][k] = Math.random() * 2.0 - 1.0;
+            if(layerNum < sizes.length - 1) {
+                nextSize = sizes[layerNum + 1];
+            }
+            layers[layerNum] = new Layer(sizes[layerNum], nextSize);
+            for (int layerCount = 0; layerCount < sizes[layerNum]; layerCount++) {
+                layers[layerNum].biases[layerCount] = Math.random() * 2.0 - 1.0;
+                for (int nextCount = 0; nextCount < nextSize; nextCount++) {
+                    layers[layerNum].weights[layerCount][nextCount] = Math.random() * 2.0 - 1.0;
                 }
             }
         }

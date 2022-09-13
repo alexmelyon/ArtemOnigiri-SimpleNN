@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.function.UnaryOperator;
 
-public class FormDots extends JFrame implements Runnable, MouseListener {
+public class FormDots extends JFrame implements Runnable {
 
-    private final int w = 1280;
-    private final int h = 720;
+    private final int formWidth = 1280;
+    private final int formHeight = 720;
+    private static final int PIXEL = 8;
 
-    private BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-    private BufferedImage pimg = new BufferedImage(w / 8, h / 8, BufferedImage.TYPE_INT_RGB);
-    private int frame = 0;
+    private BufferedImage img = new BufferedImage(formWidth, formHeight, BufferedImage.TYPE_INT_RGB);
+    private BufferedImage pimg = new BufferedImage(formWidth / PIXEL, formHeight / PIXEL, BufferedImage.TYPE_INT_RGB);
 
     private NeuralNetwork nn;
 
@@ -25,19 +25,29 @@ public class FormDots extends JFrame implements Runnable, MouseListener {
         UnaryOperator<Double> dsigmoid = y -> y * (1 - y);
         nn = new NeuralNetwork(0.01, sigmoid, dsigmoid, 2, 5, 5, 2);
 
-        this.setSize(w + 16, h + 38);
+        this.setSize(formWidth + 16, formHeight + 38);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocation(50, 50);
         this.add(new JLabel(new ImageIcon(img)));
-        addMouseListener(this);
+//        addMouseListener(this);
+        addMouseListener(new MouseListener() {
+            @Override public void mouseClicked(MouseEvent e) {}
+            @Override public void mouseReleased(MouseEvent e) {}
+            @Override public void mouseEntered(MouseEvent e) {}
+            @Override public void mouseExited(MouseEvent e) {}
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                FormDots.this.mousePressed(e);
+            }
+        });
     }
 
     @Override
     public void run() {
         while (true) {
             this.repaint();
-//            try { Thread.sleep(17); } catch (InterruptedException e) {}
         }
     }
 
@@ -46,8 +56,8 @@ public class FormDots extends JFrame implements Runnable, MouseListener {
         if(points.size() > 0) {
             for (int k = 0; k < 10000; k++) {
                 Point p = points.get((int) (Math.random() * points.size()));
-                double nx = (double) p.x / w - 0.5;
-                double ny = (double) p.y / h - 0.5;
+                double nx = (double) p.x / formWidth - 0.5;
+                double ny = (double) p.y / formHeight - 0.5;
                 nn.feedForward(new double[]{nx, ny});
                 double[] targets = new double[2];
                 if (p.type == 0) targets[0] = 1;
@@ -55,10 +65,10 @@ public class FormDots extends JFrame implements Runnable, MouseListener {
                 nn.backpropagation(targets);
             }
         }
-        for (int i = 0; i < w / 8; i++) {
-            for (int j = 0; j < h / 8; j++) {
-                double nx = (double) i / w * 8 - 0.5;
-                double ny = (double) j / h * 8 - 0.5;
+        for (int i = 0; i < formWidth / PIXEL; i++) {
+            for (int j = 0; j < formHeight / PIXEL; j++) {
+                double nx = (double) i / formWidth * PIXEL - 0.5;
+                double ny = (double) j / formHeight * PIXEL - 0.5;
                 double[] outputs = nn.feedForward(new double[]{nx, ny});
                 double green = Math.max(0, Math.min(1, outputs[0] - outputs[1] + 0.5));
                 double blue = 1 - green;
@@ -69,7 +79,7 @@ public class FormDots extends JFrame implements Runnable, MouseListener {
             }
         }
         Graphics ig = img.getGraphics();
-        ig.drawImage(pimg, 0, 0, w, h, this);
+        ig.drawImage(pimg, 0, 0, formWidth, formHeight, this);
         for (Point p : points) {
             ig.setColor(Color.WHITE);
             ig.fillOval(p.x - 3, p.y - 3, 26, 26);
@@ -77,34 +87,13 @@ public class FormDots extends JFrame implements Runnable, MouseListener {
             else ig.setColor(Color.BLUE);
             ig.fillOval(p.x, p.y, 20, 20);
         }
-        g.drawImage(img, 8, 30, w, h, this);
-        frame++;
+        g.drawImage(img, 8, 30, formWidth, formHeight, this);
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
+//    MouseListener
+    void mousePressed(MouseEvent e) {
         int type = 0;
         if(e.getButton() == 3) type = 1;
         points.add(new Point(e.getX() - 16, e.getY() - 38, type));
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
     }
 }
